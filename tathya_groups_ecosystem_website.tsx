@@ -1757,6 +1757,13 @@ function RealEstateChildView({ division, navigateToView, openContextualEnquiry }
 
   return (
     <div className="bg-[#FAF9F6] text-[#0F291E] min-h-screen">
+      <ApartmentScrollTransformation
+        onEnquire={(service, note) =>
+          openContextualEnquiry('real-estate', service || 'Studio Apartments', note)
+        }
+        navigateToView={navigateToView}
+      />
+
       {/* Real Estate Hero */}
       <section className="relative bg-[#0F291E] text-[#FAF9F6] py-14 sm:py-20 lg:py-28 overflow-hidden">
         <div className="absolute inset-0 opacity-25">
@@ -1836,13 +1843,7 @@ function RealEstateChildView({ division, navigateToView, openContextualEnquiry }
       {/* ========================================================
           APARTMENT TRANSFORMATION SCROLL ENGINE (TIMELAPSE)
       ======================================================== */}
-      <ApartmentScrollTransformation
-        onEnquire={(service, note) =>
-          openContextualEnquiry('real-estate', service || 'Studio Apartments', note)
-        }
-        navigateToView={navigateToView}
-      />
-
+      
       {/* Interactive Property Segment Filter & Showcase */}
       <section className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 sm:mb-8 gap-4">
