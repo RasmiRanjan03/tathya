@@ -1,0 +1,27 @@
+# Dependencies and generated build output
+/node_modules/
+/dist/
+
+# Local demo and source archive
+/demo.html
+/frames_*.zip
+
+# Unused root-level copies (the site uses assets under public/)
+/Event.jpg
+/Production.jpg
+/Real Estate.jpg
+/brand-construction.png
+/brand-event.png
+/brand-mandap.png
+/brand-production.png
+/brand-realestate.png
+/construction.jpg
+/mandap.jpg
+/transformation_preview.jpg
+
+# Local environment and operating-system files
+.env*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
