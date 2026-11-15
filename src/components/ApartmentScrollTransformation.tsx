@@ -16,6 +16,9 @@ import {
   Zap,
   Info,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
+  X,
   Home,
   Check
 } from 'lucide-react';
@@ -153,9 +156,14 @@ export default function ApartmentScrollTransformation({
   const [loadedCount, setLoadedCount] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState<1 | 1.5 | 2>(1);
-  const [showHotspots, setShowHotspots] = useState(true);
+  const [showHotspots, setShowHotspots] = useState(false);
   const [activeHotspotIndex, setActiveHotspotIndex] = useState<number | null>(null);
   const [isInitialReady, setIsInitialReady] = useState(false);
+  const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
+
+  // Touch swipe support for mobile
+  const touchStartX = useRef<number | null>(null);
+  const touchStartFrame = useRef<number>(0);
 
   // Active milestone based on current frame
   const activeMilestone =
@@ -324,8 +332,6 @@ export default function ApartmentScrollTransformation({
 
       if (totalScrollable <= 0) return;
 
-      // When container top reaches top of viewport, scrolled = 0
-      // When container bottom reaches bottom of viewport, scrolled = totalScrollable
       const scrolled = -rect.top;
       const progress = Math.max(0, Math.min(1, scrolled / totalScrollable));
       const targetFrame = Math.round(progress * (TOTAL_FRAMES - 1));
@@ -392,79 +398,123 @@ export default function ApartmentScrollTransformation({
     }
   };
 
+  // Horizontal touch gesture handler on canvas for mobile scrubbing
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartFrame.current = currentFrame;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current !== null && e.touches.length === 1) {
+      const deltaX = e.touches[0].clientX - touchStartX.current;
+      // 2.5px drag = 1 frame scrub
+      const frameDelta = Math.round(deltaX / 2.5);
+      const newFrame = Math.max(0, Math.min(TOTAL_FRAMES - 1, touchStartFrame.current + frameDelta));
+      if (newFrame !== currentFrame) {
+        setCurrentFrame(newFrame);
+        drawFrame(newFrame);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    touchStartX.current = null;
+  };
+
   const progressPercent = Math.round((currentFrame / (TOTAL_FRAMES - 1)) * 100);
 
   return (
     <section
       ref={containerRef}
       id="transformation-engine"
-      className="relative h-[380vh] bg-[#0A0A0C] text-white selection:bg-amber-400 selection:text-black"
+      className="relative h-[290vh] md:h-[350vh] lg:h-[380vh] bg-[#0A0A0C] text-white selection:bg-amber-400 selection:text-black"
     >
-      {/* Sticky Fullscreen Scrollytelling Stage */}
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-between overflow-hidden">
+      {/* Sticky Scrollytelling Stage */}
+      <div className="sticky top-0 h-[100dvh] w-full flex flex-col justify-between overflow-hidden">
         {/* Background Canvas Layer */}
-        <div className="absolute inset-0 z-0">
+        <div
+          className="absolute inset-0 z-0"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <canvas
             ref={canvasRef}
             className="w-full h-full block"
-            style={{ touchAction: 'none' }}
+            style={{ touchAction: 'pan-y' }}
           />
           {/* Subtle cinematic vignette */}
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/75 via-transparent to-black/90" />
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-black/50 via-transparent to-black/30" />
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/80 via-transparent to-black/90" />
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-black/40 via-transparent to-black/30" />
         </div>
 
-        {/* TOP HUD BAR */}
-        <header className="relative z-20 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-5">
-          <div className="flex flex-wrap items-center justify-between gap-4 p-3.5 sm:p-4 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/10 shadow-2xl">
-            {/* Left: Brand & Engine Tag */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full p-[2px] bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 shadow-lg shadow-amber-500/20 shrink-0">
+        {/* TOP HUD BAR - Ultra clean on mobile, full on desktop */}
+        <header className="relative z-20 max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4">
+          <div className="flex items-center justify-between gap-2 p-2 sm:p-3.5 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/10 shadow-2xl">
+            {/* Left: Brand Identity */}
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full p-[1.5px] sm:p-[2px] bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 shadow-md shrink-0">
                 <img
                   src="/logos/brand-realestate.png"
-                  alt="Tathya Real Estate & Media"
+                  alt="Tathya Real Estate"
                   className="w-full h-full object-cover rounded-full bg-white"
                 />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-editorial font-bold text-sm sm:text-base tracking-wide text-white">
+              <div className="truncate">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-editorial font-bold text-xs sm:text-base tracking-wide text-white truncate">
                     TATHYA REAL ESTATE
                   </span>
                   <span className="hidden sm:inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                     <Sparkles className="w-2.5 h-2.5" />
-                    Interactive Engine
+                    Engine
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-400">
-                  Apartment Transformation Time-Lapse • Scroll to scrub or play
+                <p className="text-[10px] sm:text-[11px] text-zinc-400 truncate hidden xs:block">
+                  Apartment Transformation Time-Lapse
                 </p>
               </div>
             </div>
 
-            {/* Right: Active Phase & Status */}
-            <div className="flex items-center gap-3">
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs">
+            {/* Right: Active Phase & Status Controls */}
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+              {/* Active Phase Pill */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-[11px] sm:text-xs">
                 <div
-                  className="w-2.5 h-2.5 rounded-full animate-pulse"
+                  className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full animate-pulse"
                   style={{ backgroundColor: activeMilestone.accent }}
                 />
-                <span className="text-zinc-400">Phase {activeMilestone.phase}:</span>
-                <span className="font-semibold text-white">{activeMilestone.label}</span>
-              </div>
-
-              {/* Buffer indicator */}
-              <div className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-amber-300 flex items-center gap-2">
-                <span>{progressPercent}% Transformed</span>
-                <span className="hidden sm:inline text-zinc-500">
-                  [{currentFrame + 1}/{TOTAL_FRAMES}]
+                <span className="font-semibold text-white">
+                  Ph.{activeMilestone.phase}
                 </span>
+                <span className="hidden sm:inline text-zinc-400">• {activeMilestone.label}</span>
               </div>
 
-              {/* Hotspot Toggle */}
+              {/* Progress percentage */}
+              <div className="px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-[11px] sm:text-xs font-mono text-amber-300 font-bold">
+                {progressPercent}%
+              </div>
+
+              {/* Mobile Specs Sheet Toggle */}
+              <button
+                onClick={() => setMobileDetailsOpen(!mobileDetailsOpen)}
+                className={`lg:hidden p-1.5 sm:p-2 rounded-xl border text-xs flex items-center gap-1 transition-all ${
+                  mobileDetailsOpen
+                    ? 'bg-amber-400 text-zinc-950 border-amber-400 font-bold'
+                    : 'bg-white/10 border-white/15 text-white'
+                }`}
+                title="View Architectural Specs"
+              >
+                <Info className="w-4 h-4" />
+                <span className="text-[11px] font-medium hidden sm:inline">Specs</span>
+              </button>
+
+              {/* Hotspot Toggle (Desktop) */}
               <button
                 onClick={() => setShowHotspots(!showHotspots)}
-                className={`p-2 rounded-xl border text-xs flex items-center gap-1.5 transition-all ${
+                className={`hidden lg:flex p-2 rounded-xl border text-xs items-center gap-1.5 transition-all ${
                   showHotspots
                     ? 'bg-amber-400/20 border-amber-400/40 text-amber-300'
                     : 'bg-white/5 border-white/10 text-zinc-400 hover:text-white'
@@ -472,15 +522,15 @@ export default function ApartmentScrollTransformation({
                 title="Toggle Architectural Hotspots"
               >
                 <Eye className="w-4 h-4" />
-                <span className="hidden lg:inline text-[11px] font-medium">Specs</span>
+                <span className="text-[11px] font-medium">Specs</span>
               </button>
             </div>
           </div>
         </header>
 
-        {/* INTERACTIVE HOTSPOTS OVERLAY */}
+        {/* INTERACTIVE HOTSPOTS OVERLAY (Safe positioning on all devices) */}
         {showHotspots && (
-          <div className="relative z-10 max-w-7xl mx-auto w-full flex-grow px-4 sm:px-6 lg:px-8 pointer-events-none">
+          <div className="relative z-10 max-w-7xl mx-auto w-full flex-grow px-3 sm:px-6 lg:px-8 pointer-events-none">
             {activeMilestone.hotspots.map((spot, idx) => (
               <div
                 key={idx}
@@ -498,14 +548,14 @@ export default function ApartmentScrollTransformation({
                     style={{ backgroundColor: activeMilestone.accent }}
                   />
                   <div
-                    className="relative w-7 h-7 rounded-full flex items-center justify-center shadow-lg border border-white text-zinc-950 font-bold text-xs"
+                    className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center shadow-lg border border-white text-zinc-950 font-bold text-xs"
                     style={{ backgroundColor: activeMilestone.accent }}
                   >
                     +
                   </div>
                   {/* Tooltip Card */}
                   <div
-                    className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-3 rounded-2xl bg-black/90 backdrop-blur-xl border border-white/20 text-left shadow-2xl transition-all duration-300 ${
+                    className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2.5 w-56 sm:w-64 max-w-[80vw] p-3 rounded-2xl bg-black/95 backdrop-blur-xl border border-white/20 text-left shadow-2xl transition-all duration-300 ${
                       activeHotspotIndex === idx
                         ? 'opacity-100 scale-100 pointer-events-auto'
                         : 'opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100'
@@ -523,12 +573,12 @@ export default function ApartmentScrollTransformation({
           </div>
         )}
 
-        {/* BOTTOM HUD: DYNAMIC STORY CARD & INTERACTIVE CONTROLS */}
-        <footer className="relative z-20 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-5 space-y-3">
-          {/* Milestone Story Drawer Card */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+        {/* BOTTOM HUD: RESPONSIVE CONTROLS */}
+        <footer className="relative z-20 max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 pb-3 sm:pb-4 space-y-2.5 sm:space-y-3">
+          {/* DESKTOP STORY CARD (Hidden on mobile to preserve full video viewport) */}
+          <div className="hidden lg:grid grid-cols-12 gap-3">
             {/* Left Story Panel */}
-            <div className="lg:col-span-8 p-4 sm:p-5 rounded-3xl bg-black/75 backdrop-blur-2xl border border-white/10 shadow-2xl space-y-3">
+            <div className="col-span-8 p-4 sm:p-5 rounded-3xl bg-black/75 backdrop-blur-2xl border border-white/10 shadow-2xl space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <span
@@ -551,13 +601,13 @@ export default function ApartmentScrollTransformation({
                 <h3 className="font-editorial text-xl sm:text-2xl font-bold text-white leading-tight">
                   {activeMilestone.headline}
                 </h3>
-                <p className="text-xs sm:text-sm text-zinc-300 mt-1.5 leading-relaxed line-clamp-2 sm:line-clamp-none">
+                <p className="text-xs sm:text-sm text-zinc-300 mt-1 leading-relaxed">
                   {activeMilestone.description}
                 </p>
               </div>
 
               {/* Specs Pills */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-white/10">
+              <div className="grid grid-cols-4 gap-2 pt-1 border-t border-white/10">
                 {activeMilestone.specs.map((spec, i) => (
                   <div key={i} className="p-2 rounded-xl bg-white/5 border border-white/5">
                     <div className="text-[10px] text-zinc-400 uppercase tracking-wider">
@@ -572,7 +622,7 @@ export default function ApartmentScrollTransformation({
             </div>
 
             {/* Right Action / Synergy Callout */}
-            <div className="lg:col-span-4 p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-emerald-950/80 to-zinc-900/90 backdrop-blur-2xl border border-emerald-500/30 shadow-2xl flex flex-col justify-between space-y-3">
+            <div className="col-span-4 p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-emerald-950/80 to-zinc-900/90 backdrop-blur-2xl border border-emerald-500/30 shadow-2xl flex flex-col justify-between space-y-3">
               <div>
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber-300">
                   <Building2 className="w-3.5 h-3.5" />
@@ -612,64 +662,57 @@ export default function ApartmentScrollTransformation({
             </div>
           </div>
 
-          {/* Interactive Scrub & Playback Controller */}
-          <div className="p-3 sm:p-4 rounded-2xl bg-black/80 backdrop-blur-2xl border border-white/10 shadow-2xl flex flex-col sm:flex-row items-center gap-4">
-            {/* Playback Controls */}
-            <div className="flex items-center gap-2 shrink-0">
+          {/* MOBILE COMPACT FLOATING STAGE BANNER */}
+          <div className="lg:hidden">
+            <button
+              onClick={() => setMobileDetailsOpen(true)}
+              className="w-full p-2.5 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/15 text-left flex items-center justify-between shadow-xl active:scale-[0.99] transition-transform"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: activeMilestone.accent }}
+                />
+                <div className="truncate">
+                  <div className="text-xs font-bold text-white truncate">
+                    Phase {activeMilestone.phase}: {activeMilestone.headline}
+                  </div>
+                  <div className="text-[10px] text-zinc-400">
+                    Tap to view architectural specs & details
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-[11px] text-amber-400 font-semibold shrink-0 pl-2">
+                <span>Specs</span>
+                <ChevronUp className="w-3.5 h-3.5" />
+              </div>
+            </button>
+          </div>
+
+          {/* INTERACTIVE CONTROLS (Both Mobile & Desktop Optimized) */}
+          <div className="p-2 sm:p-3.5 rounded-2xl bg-black/85 backdrop-blur-2xl border border-white/10 shadow-2xl flex flex-col gap-2.5">
+            {/* Top row: controls + scrubber track */}
+            <div className="flex items-center gap-2 sm:gap-3 w-full">
+              {/* Play / Pause */}
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
-                className="w-10 h-10 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 flex items-center justify-center transition-all shadow-lg font-bold"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-400 hover:bg-amber-300 active:scale-95 text-zinc-950 flex items-center justify-center transition-all shadow-lg font-bold shrink-0"
                 title={isPlaying ? 'Pause Transformation' : 'Play Cinematic Time-Lapse'}
               >
                 {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
               </button>
 
+              {/* Reset to 0 */}
               <button
                 onClick={() => jumpToFrame(0)}
-                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 transition-all"
-                title="Reset to Bare Shell (Frame 0)"
+                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-zinc-300 border border-white/10 transition-all shrink-0"
+                title="Reset to Bare Shell"
               >
-                <RotateCcw className="w-4 h-4" />
+                <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
 
-              {/* Speed control */}
-              <button
-                onClick={() => setPlaySpeed((s) => (s === 1 ? 1.5 : s === 1.5 ? 2 : 1))}
-                className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 text-xs font-mono transition-all"
-                title="Playback Speed"
-              >
-                {playSpeed}x
-              </button>
-            </div>
-
-            {/* Milestone Quick Jump Buttons */}
-            <div className="hidden md:flex items-center gap-1.5 shrink-0">
-              {MILESTONES.map((m) => {
-                const isActive = activeMilestone.phase === m.phase;
-                return (
-                  <button
-                    key={m.phase}
-                    onClick={() => jumpToFrame(m.targetFrame)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                      isActive
-                        ? 'bg-white text-zinc-950 shadow-md'
-                        : 'bg-white/5 text-zinc-400 hover:text-white border border-white/5'
-                    }`}
-                  >
-                    <span
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: m.accent }}
-                    />
-                    <span>{m.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Slider Scrubber Track */}
-            <div className="flex-grow w-full flex items-center gap-3">
-              <span className="text-[11px] font-mono text-zinc-400 shrink-0">0%</span>
-              <div className="relative flex-grow flex items-center">
+              {/* Slider Scrubber Track */}
+              <div className="flex-grow flex items-center gap-2 min-w-0">
                 <input
                   type="range"
                   min={0}
@@ -677,38 +720,168 @@ export default function ApartmentScrollTransformation({
                   value={currentFrame}
                   onChange={(e) => jumpToFrame(Number(e.target.value))}
                   className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-zinc-800 accent-amber-400 focus:outline-none"
+                  aria-label="Apartment Transformation Frame Scrubber"
                 />
               </div>
-              <span className="text-[11px] font-mono text-amber-300 shrink-0">100%</span>
+
+              {/* Before / After Quick Toggles */}
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={() => jumpToFrame(0)}
+                  className={`px-2 sm:px-2.5 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all border ${
+                    currentFrame === 0
+                      ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                      : 'bg-white/5 text-zinc-400 border-white/10'
+                  }`}
+                >
+                  Before
+                </button>
+                <button
+                  onClick={() => jumpToFrame(TOTAL_FRAMES - 1)}
+                  className={`px-2 sm:px-2.5 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all border ${
+                    currentFrame === TOTAL_FRAMES - 1
+                      ? 'bg-amber-400 text-zinc-950 border-amber-400 font-bold'
+                      : 'bg-white/5 text-zinc-400 border-white/10'
+                  }`}
+                >
+                  After
+                </button>
+              </div>
             </div>
 
-            {/* Before / After Instant Toggle */}
-            <div className="flex items-center gap-1.5 shrink-0">
+            {/* Bottom Row: Milestone Jump Pills (Horizontal scroll on mobile, flex on desktop) */}
+            <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar pt-1 border-t border-white/10">
+              <div className="flex items-center gap-1 shrink-0">
+                {MILESTONES.map((m) => {
+                  const isActive = activeMilestone.phase === m.phase;
+                  return (
+                    <button
+                      key={m.phase}
+                      onClick={() => jumpToFrame(m.targetFrame)}
+                      className={`px-2 sm:px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                        isActive
+                          ? 'bg-white text-zinc-950 font-bold shadow-sm'
+                          : 'bg-white/5 text-zinc-400 hover:text-white border border-white/5'
+                      }`}
+                    >
+                      <span
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{ backgroundColor: m.accent }}
+                      />
+                      <span>{m.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Speed control */}
               <button
-                onClick={() => jumpToFrame(0)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
-                  currentFrame === 0
-                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                    : 'bg-white/5 text-zinc-400 border-white/10 hover:text-white'
-                }`}
+                onClick={() => setPlaySpeed((s) => (s === 1 ? 1.5 : s === 1.5 ? 2 : 1))}
+                className="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 text-[10px] sm:text-xs font-mono shrink-0 ml-1"
+                title="Playback Speed"
               >
-                Before
-              </button>
-              <button
-                onClick={() => jumpToFrame(TOTAL_FRAMES - 1)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
-                  currentFrame === TOTAL_FRAMES - 1
-                    ? 'bg-amber-400 text-zinc-950 border-amber-400 font-bold'
-                    : 'bg-white/5 text-zinc-400 border-white/10 hover:text-white'
-                }`}
-              >
-                After
+                {playSpeed}x
               </button>
             </div>
           </div>
         </footer>
       </div>
+
+      {/* MOBILE SLIDE-UP SPECS & STORY SHEET */}
+      {mobileDetailsOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end">
+          {/* Dark backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileDetailsOpen(false)}
+          />
+
+          {/* Bottom Sheet Modal */}
+          <div className="relative z-10 w-full max-h-[80vh] overflow-y-auto rounded-t-3xl bg-[#0D0D11] border-t border-white/20 p-5 space-y-4 shadow-2xl animate-in slide-in-from-bottom-6">
+            {/* Drag handle */}
+            <div className="flex items-center justify-between pb-1">
+              <div className="flex items-center gap-2">
+                <span
+                  className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-zinc-950"
+                  style={{ backgroundColor: activeMilestone.accent }}
+                >
+                  Stage {activeMilestone.phase} of 05
+                </span>
+                <span className="text-xs text-zinc-400">{activeMilestone.sublabel}</span>
+              </div>
+              <button
+                onClick={() => setMobileDetailsOpen(false)}
+                className="p-1.5 rounded-full bg-white/10 text-zinc-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div>
+              <h3 className="font-editorial text-xl font-bold text-white leading-tight">
+                {activeMilestone.headline}
+              </h3>
+              <p className="text-xs text-zinc-300 mt-2 leading-relaxed">
+                {activeMilestone.description}
+              </p>
+            </div>
+
+            {/* Specs Pills */}
+            <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/10">
+              {activeMilestone.specs.map((spec, i) => (
+                <div key={i} className="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                  <div className="text-[10px] text-zinc-400 uppercase tracking-wider">
+                    {spec.label}
+                  </div>
+                  <div className="text-xs font-semibold text-white mt-0.5">
+                    {spec.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Synergy Callout */}
+            <div className="p-3.5 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 space-y-1.5">
+              <div className="text-[10px] uppercase font-bold tracking-widest text-amber-300 flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5" />
+                <span>Tathya Ecosystem Synergy</span>
+              </div>
+              <p className="text-xs text-emerald-100/90 leading-relaxed">
+                {activeMilestone.synergy}
+              </p>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                onClick={() => {
+                  setMobileDetailsOpen(false);
+                  onEnquire?.(
+                    'Studio Apartments',
+                    `Transformation Inquiry: Phase ${activeMilestone.phase} (${activeMilestone.label})`
+                  );
+                }}
+                className="flex-1 py-3 px-4 rounded-xl bg-[#C59B27] hover:bg-amber-400 text-zinc-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg"
+              >
+                <span>Enquire for Fit-Out</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              {navigateToView && (
+                <button
+                  onClick={() => {
+                    setMobileDetailsOpen(false);
+                    navigateToView('construction');
+                  }}
+                  className="py-3 px-3.5 rounded-xl bg-white/10 text-white border border-white/10 text-xs font-semibold flex items-center gap-1.5"
+                >
+                  <Building2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Construction</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
-

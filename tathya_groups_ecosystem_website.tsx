@@ -495,12 +495,12 @@ export default function App() {
       {/* =========================================================
           PERSISTENT ECOSYSTEM CHAMELEON TOP BAR
       ========================================================= */}
-      <div className="bg-[#070709] text-zinc-300 border-b border-white/10 text-xs font-sans-sharp z-50 sticky top-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between">
+      <div className="bg-[#070709] text-zinc-300 border-b border-white/10 text-xs font-sans-sharp z-50 relative md:sticky md:top-0">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-9 sm:h-10 flex items-center justify-between">
           <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
             <button
               onClick={() => navigateToView('home')}
-              className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1.5 whitespace-nowrap font-medium ${
+              className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1.5 whitespace-nowrap font-medium text-[11px] sm:text-xs ${
                 activeView === 'home'
                   ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                   : 'hover:text-white text-zinc-400'
@@ -517,7 +517,7 @@ export default function App() {
                 <button
                   key={div.id}
                   onClick={() => navigateToView(div.id)}
-                  className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                  className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1.5 whitespace-nowrap text-[11px] sm:text-xs ${
                     isActive
                       ? 'bg-white text-zinc-950 font-semibold shadow-sm'
                       : 'text-zinc-400 hover:text-white hover:bg-white/5'
@@ -554,7 +554,7 @@ export default function App() {
           MAIN ADAPTIVE NAVIGATION BAR
       ========================================================= */}
       <header
-        className={`sticky top-10 z-40 backdrop-blur-xl transition-colors duration-500 border-b ${
+        className={`sticky top-0 md:top-10 z-40 backdrop-blur-xl transition-colors duration-500 border-b ${
           activeView === 'home' || activeView === 'production' || activeView === 'events'
             ? 'bg-[#0A0A0C]/90 border-white/10 text-white'
             : activeView === 'real-estate'
@@ -564,20 +564,20 @@ export default function App() {
             : 'bg-[#FFFDF9]/95 border-amber-900/15 text-[#4A0E17]'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between font-sans-sharp">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between font-sans-sharp">
           {/* Brand Identity */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             {activeView !== 'home' && (
               <button
                 onClick={() => navigateToView('home')}
-                className="p-2 rounded-full border border-current/20 hover:scale-105 transition-transform flex items-center justify-center"
+                className="p-1.5 sm:p-2 rounded-full border border-current/20 hover:scale-105 transition-transform flex items-center justify-center shrink-0"
                 title="Back to Tathya Groups Parent Hub"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             )}
-            <button onClick={() => navigateToView('home')} className="text-left group flex items-center gap-3">
-              <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full p-[2px] bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 shadow-md shadow-amber-500/20 shrink-0 group-hover:scale-105 transition-transform flex items-center justify-center">
+            <button onClick={() => navigateToView('home')} className="text-left group flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-full p-[1.5px] sm:p-[2px] bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 shadow-md shadow-amber-500/20 shrink-0 group-hover:scale-105 transition-transform flex items-center justify-center">
                 <img
                   src={
                     activeView !== 'home'
@@ -588,18 +588,18 @@ export default function App() {
                   className="w-full h-full object-cover rounded-full bg-white"
                 />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-editorial font-bold tracking-wider text-xl sm:text-2xl leading-none">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="font-editorial font-bold tracking-wider text-base sm:text-2xl leading-none truncate">
                     TATHYA GROUPS
                   </span>
                   {activeView !== 'home' && (
-                    <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full font-semibold bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                    <span className="text-[9px] sm:text-[10px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5 rounded-full font-semibold bg-amber-500/20 text-amber-500 border border-amber-500/30 shrink-0">
                       {DIVISIONS.find((d) => d.id === activeView)?.shortName}
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] opacity-70 tracking-wide mt-0.5">
+                <p className="text-[10px] sm:text-[11px] opacity-70 tracking-wide mt-0.5 truncate hidden xs:block">
                   Tathya Realestate & Media Pvt. Ltd.
                 </p>
               </div>
@@ -656,7 +656,7 @@ export default function App() {
 
         {/* Mobile Drawer Menu */}
         {mobileMenuOpen && (
-          <div className="xl:hidden bg-[#0A0A0C] text-white border-b border-white/10 px-4 pt-3 pb-6 space-y-2 font-sans-sharp">
+          <div className="xl:hidden bg-[#0A0A0C] text-white border-b border-white/10 px-4 pt-3 pb-8 space-y-2 font-sans-sharp max-h-[82vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 mb-2">
               <div className="w-10 h-10 rounded-full p-[1.5px] bg-gradient-to-br from-amber-300 to-amber-600 shrink-0">
                 <img
@@ -1183,7 +1183,7 @@ function ParentHomeView({
                 <span>Odisha’s Premier Multi-Business Conglomerate</span>
               </div>
 
-              <h1 className="font-editorial text-4xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight text-white">
+              <h1 className="font-editorial text-3xl sm:text-5xl lg:text-7xl font-bold leading-[1.08] tracking-tight text-white break-words">
                 Five Industries.{' '}
                 <span className="italic font-normal bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 bg-clip-text text-transparent">
                   One Standard
@@ -1191,11 +1191,11 @@ function ParentHomeView({
                 of Excellence.
               </h1>
 
-              <p className="text-lg sm:text-xl text-amber-200/90 font-editorial italic">
+              <p className="text-base sm:text-xl text-amber-200/90 font-editorial italic">
                 “{COMPANY_INFO.taglinePrimary}” — {COMPANY_INFO.taglineSecondary}
               </p>
 
-              <p className="text-sm sm:text-base text-zinc-300 max-w-2xl leading-relaxed">
+              <p className="text-xs sm:text-base text-zinc-300 max-w-2xl leading-relaxed">
                 Welcome to <strong>Tathya Groups</strong> ({COMPANY_INFO.legalName}), headquartered at
                 Esplanade One, Bhubaneswar. Instead of dealing with disconnected vendors, experience
                 one unified ecosystem that helps you <strong>acquire prime land</strong>,{' '}
@@ -1208,7 +1208,7 @@ function ParentHomeView({
                 <div className="text-[11px] uppercase tracking-widest text-zinc-400 mb-3 flex items-center gap-2">
                   <span>Click any milestone below to preview our ecosystem:</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-nowrap overflow-x-auto no-scrollbar gap-2 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
                   {DIVISIONS.map((div, idx) => {
                     const isSelected = idx === heroActiveIndex;
                     return (
@@ -1216,7 +1216,7 @@ function ParentHomeView({
                         key={div.id}
                         onClick={() => setHeroActiveIndex(idx)}
                         onMouseEnter={() => setHeroActiveIndex(idx)}
-                        className={`px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-2 border ${
+                        className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all shrink-0 flex items-center gap-2 border ${
                           isSelected
                             ? 'bg-amber-500 text-zinc-950 border-amber-400 font-bold shadow-lg shadow-amber-500/20 scale-[1.02]'
                             : 'bg-white/5 text-zinc-300 border-white/15 hover:bg-white/10 hover:border-white/30'
@@ -1230,17 +1230,17 @@ function ParentHomeView({
               </div>
 
               {/* Hero CTAs */}
-              <div className="pt-4 flex flex-wrap items-center gap-4">
+              <div className="pt-3 sm:pt-4 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
                 <button
                   onClick={() => navigateToView(activeHeroDivision.id)}
-                  className="px-7 py-4 rounded-full bg-white text-zinc-950 hover:bg-amber-400 font-bold text-sm transition-all flex items-center gap-2.5 shadow-xl"
+                  className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-full bg-white text-zinc-950 hover:bg-amber-400 font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2.5 shadow-xl"
                 >
                   <span>Enter {activeHeroDivision.name} World</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => openContextualEnquiry(activeHeroDivision.id)}
-                  className="px-6 py-4 rounded-full bg-white/10 hover:bg-white/15 text-white border border-white/20 font-semibold text-sm transition-all"
+                  className="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-full bg-white/10 hover:bg-white/15 text-white border border-white/20 font-semibold text-xs sm:text-sm transition-all text-center"
                 >
                   Enquire with {activeHeroDivision.shortName}
                 </button>
@@ -1758,7 +1758,7 @@ function RealEstateChildView({ division, navigateToView, openContextualEnquiry }
   return (
     <div className="bg-[#FAF9F6] text-[#0F291E] min-h-screen">
       {/* Real Estate Hero */}
-      <section className="relative bg-[#0F291E] text-[#FAF9F6] py-20 lg:py-28 overflow-hidden">
+      <section className="relative bg-[#0F291E] text-[#FAF9F6] py-14 sm:py-20 lg:py-28 overflow-hidden">
         <div className="absolute inset-0 opacity-25">
           <img
             src={division.heroImage}
@@ -1767,55 +1767,55 @@ function RealEstateChildView({ division, navigateToView, openContextualEnquiry }
           />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl space-y-5">
-            <div className="flex items-center gap-3.5">
-              <div className="w-16 h-16 rounded-full p-[2px] bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 shadow-xl shadow-amber-500/20 shrink-0">
+          <div className="max-w-3xl space-y-4 sm:space-y-5">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full p-[2px] bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 shadow-xl shadow-amber-500/20 shrink-0">
                 <img
                   src={division.logo || '/logos/brand-realestate.png'}
                   alt={division.name}
                   className="w-full h-full object-cover rounded-full bg-white"
                 />
               </div>
-              <div>
-                <span className="text-xs uppercase tracking-widest text-amber-300 font-bold block">
+              <div className="min-w-0">
+                <span className="text-[11px] sm:text-xs uppercase tracking-widest text-amber-300 font-bold block truncate">
                   Tathya Realestate & Media Pvt. Ltd.
                 </span>
-                <span className="text-xs text-emerald-200/80">
+                <span className="text-[11px] sm:text-xs text-emerald-200/80 block truncate">
                   Odisha's Trusted Property & Construction Ecosystem
                 </span>
               </div>
             </div>
 
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-900/80 border border-amber-400/40 text-amber-300 text-xs font-semibold uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-900/80 border border-amber-400/40 text-amber-300 text-[11px] sm:text-xs font-semibold uppercase tracking-widest">
               <Building2 className="w-3.5 h-3.5" />
               <span>Division 01 • {division.instagram}</span>
             </div>
-            <h1 className="font-editorial text-5xl sm:text-6xl font-bold leading-tight text-white">
+            <h1 className="font-editorial text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight text-white break-words">
               {division.name}
             </h1>
-            <p className="font-editorial italic text-2xl sm:text-3xl text-amber-300">
+            <p className="font-editorial italic text-xl sm:text-3xl text-amber-300">
               “{division.tagline}”
             </p>
-            <p className="text-base text-emerald-100/90 leading-relaxed">
+            <p className="text-xs sm:text-base text-emerald-100/90 leading-relaxed">
               Tathya Real Estate focuses on providing transparent, high-appreciation property solutions
               for individuals, families, and investors across Bhubaneswar and Odisha. Whether you are
               searching for a residential plot, a modern studio apartment, a luxury duplex villa, or a
               holiday home, we guide you at every step.
             </p>
-            <div className="pt-3 flex flex-wrap gap-4">
+            <div className="pt-2 sm:pt-3 flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-4">
               <button
                 onClick={() => {
                   const el = document.getElementById('transformation-engine');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="px-7 py-3.5 rounded-full bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-sm transition-all shadow-xl hover:scale-105 flex items-center gap-2"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-xs sm:text-sm transition-all shadow-xl hover:scale-105 flex items-center justify-center gap-2"
               >
                 <Sparkles className="w-4 h-4 text-emerald-950" />
                 <span>Experience Apartment Transformation</span>
               </button>
               <button
                 onClick={() => openContextualEnquiry('real-estate', 'Residential Plots')}
-                className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-sm transition-all shadow-lg"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs sm:text-sm transition-all shadow-lg text-center"
               >
                 Schedule a Site Visit / Enquire
               </button>
@@ -1823,7 +1823,7 @@ function RealEstateChildView({ division, navigateToView, openContextualEnquiry }
                 href={division.instagramUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 text-sm font-medium flex items-center gap-2"
+                className="w-full sm:w-auto px-5 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs sm:text-sm font-medium flex items-center justify-center gap-2"
               >
                 <Instagram className="w-4 h-4 text-amber-300" />
                 <span>{division.instagram}</span>
@@ -1844,13 +1844,13 @@ function RealEstateChildView({ division, navigateToView, openContextualEnquiry }
       />
 
       {/* Interactive Property Segment Filter & Showcase */}
-      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      <section className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 sm:mb-8 gap-4">
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-emerald-800">
               Interactive Portfolio Explorer
             </span>
-            <h2 className="font-editorial text-4xl font-bold text-[#0F291E] mt-1">
+            <h2 className="font-editorial text-2xl sm:text-4xl font-bold text-[#0F291E] mt-1">
               Explore Our 7 Property Segments
             </h2>
           </div>
@@ -1859,13 +1859,13 @@ function RealEstateChildView({ division, navigateToView, openContextualEnquiry }
           </div>
         </div>
 
-        {/* Segment Filter Bar */}
-        <div className="flex flex-wrap gap-2 pb-8 border-b border-emerald-950/10">
+        {/* Segment Filter Bar (Horizontal scroll on mobile, wrap on desktop) */}
+        <div className="flex flex-nowrap overflow-x-auto no-scrollbar gap-2 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap border-b border-emerald-950/10">
           {segments.map((seg) => (
             <button
               key={seg}
               onClick={() => setSelectedSegment(seg)}
-              className={`px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all ${
+              className={`px-3.5 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all shrink-0 ${
                 selectedSegment === seg
                   ? 'bg-[#0F291E] text-amber-300 shadow-md'
                   : 'bg-white text-emerald-950 border border-emerald-950/15 hover:border-emerald-800'
@@ -2028,16 +2028,16 @@ function ConstructionChildView({ division, navigateToView, openContextualEnquiry
               <HardHat className="w-4 h-4" />
               <span>DIVISION 02 // STRUCTURAL & TURNKEY ENGINEERING</span>
             </div>
-            <h1 className="font-editorial text-5xl sm:text-6xl font-bold tracking-tight">
+            <h1 className="font-editorial text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight break-words">
               {division.name}
             </h1>
-            <p className="text-2xl font-editorial italic text-amber-400">“{division.tagline}”</p>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
+            <p className="text-xl sm:text-2xl font-editorial italic text-amber-400">“{division.tagline}”</p>
+            <p className="text-xs sm:text-base text-slate-300 leading-relaxed max-w-2xl">
               At Tathya Construction, we believe every great structure begins with a great vision. We
               provide end-to-end construction solutions designed to bring residential and commercial
               projects to life with quality, durability, and professional supervision.
             </p>
-            <div className="flex flex-wrap gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 pt-2">
               <button
                 onClick={() => openContextualEnquiry('construction', projectType)}
                 className="px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm flex items-center gap-2 shadow-lg"
@@ -2300,18 +2300,18 @@ function ProductionChildView({ division, openContextualEnquiry }) {
                 <Clapperboard className="w-3.5 h-3.5" />
                 <span>Division 03 • {division.instagram}</span>
               </div>
-              <h1 className="font-editorial text-5xl sm:text-6xl font-bold text-white">
+              <h1 className="font-editorial text-3xl sm:text-5xl lg:text-6xl font-bold text-white break-words">
                 {division.name}
               </h1>
-              <p className="font-editorial italic text-2xl text-rose-400">“{division.tagline}”</p>
-              <p className="text-sm sm:text-base text-zinc-300 leading-relaxed">
+              <p className="font-editorial italic text-xl sm:text-2xl text-rose-400">“{division.tagline}”</p>
+              <p className="text-xs sm:text-base text-zinc-300 leading-relaxed">
                 Tathya Production is our creative media and film production division, dedicated to
                 bringing stories to life through visual creativity and professional production. Every
                 story deserves to be presented with creativity, emotion, and cinematic impact.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3">
               <button
                 onClick={() => openContextualEnquiry('production', 'Film Production')}
                 className="px-6 py-3.5 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-rose-600/30"
@@ -2468,13 +2468,13 @@ function NarayanMandapChildView({ division, navigateToView, openContextualEnquir
             <Sparkles className="w-3.5 h-3.5" />
             <span>Division 04 • {division.instagram}</span>
           </div>
-          <h1 className="font-editorial text-5xl sm:text-6xl font-bold text-white mt-4">
+          <h1 className="font-editorial text-3xl sm:text-5xl lg:text-6xl font-bold text-white mt-3 sm:mt-4 break-words">
             {division.name}
           </h1>
-          <p className="font-editorial italic text-2xl sm:text-3xl text-amber-300 mt-2">
+          <p className="font-editorial italic text-xl sm:text-3xl text-amber-300 mt-2">
             “{division.tagline}”
           </p>
-          <p className="text-sm sm:text-base text-amber-100/90 mt-4 leading-relaxed">
+          <p className="text-xs sm:text-base text-amber-100/90 mt-3 sm:mt-4 leading-relaxed">
             Tathya Narayan Mandap is dedicated to providing a welcoming, auspicious venue for
             weddings, receptions, and memorable family occasions. Whether it is an intimate gathering
             or a grand celebration, we make every moment royal.
@@ -2684,11 +2684,11 @@ function EventsChildView({ division, openContextualEnquiry }) {
               <CalendarHeart className="w-3.5 h-3.5" />
               <span>Division 05 • {division.instagram}</span>
             </div>
-            <h1 className="font-editorial text-5xl sm:text-6xl font-bold">{division.name}</h1>
-            <p className="font-editorial italic text-2xl sm:text-3xl text-pink-400">
+            <h1 className="font-editorial text-3xl sm:text-5xl lg:text-6xl font-bold break-words">{division.name}</h1>
+            <p className="font-editorial italic text-xl sm:text-3xl text-pink-400">
               “{division.tagline}”
             </p>
-            <p className="text-sm sm:text-base text-zinc-300 leading-relaxed">
+            <p className="text-xs sm:text-base text-zinc-300 leading-relaxed">
               Tathya Events focuses on creating memorable experiences through precision event planning
               and creative management. From grand personal celebrations to high-profile corporate
               gatherings, we bring organization, glamour, and attention to detail to every occasion.
